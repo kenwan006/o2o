@@ -9,6 +9,7 @@ create table `tb_area`(
 	unique key `UK_AREA`(`area_name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
+
 create table `tb_person_info`(
 	`user_id` int(10) NOT NULL AUTO_INCREMENT,
     `name` varchar(32) DEFAULT NULL,
@@ -82,7 +83,7 @@ create table `tb_shop` (
 `priority` int(3) DEFAULT '0',
 `create_time` datetime DEFAULT NULL,
 `last_edit_time` datetime DEFAULT NULL,
-`enable_statue` int(2) NOT NULL DEFAULT '0',
+`enable_status` int(2) NOT NULL DEFAULT '0',
 `advice` varchar(255) DEFAULT NULL,
 primary key (`shop_id`),
 constraint `fk_shop_area` foreign key(`area_id`) references `tb_area`(`area_id`),

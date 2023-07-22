@@ -1,0 +1,154 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>SUI Mobile Demo</title>
+    <meta name="description" content="MSUI: Build mobile apps with simple HTML, CSS, and JS components.">
+    <meta name="author" content="阿里巴巴国际UED前端">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1">
+    <link rel="shortcut icon" href="/favicon.ico">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no">
+
+    <!-- Google Web Fonts -->
+
+    <link rel="stylesheet" type="text/css" href="../resources/css/common/sm.min.css">
+    <link rel="stylesheet" type="text/css" href="../resources/css/common/sm-extend.min.css">
+
+    <link rel="apple-touch-icon-precomposed" href="/assets/img/apple-touch-icon-114x114.png">
+</head>
+<body>
+<div class="page-group">
+    <div id="page-label-input" class="page">
+        <header class="bar bar-nav">
+            <a class="button button-link button-nav pull-left back" href="/demos/form">
+                <span class="icon icon-left"></span>
+                go back
+            </a>
+            <h1 class="title">Shop info</h1>
+        </header>
+        <div class="content">
+            <div class="list-block">
+                <ul>
+                <!-- input shop name -->
+                    <li>
+                        <div class="item-content">
+                            <div class="item-title label">Shop name </div>
+                            <div class="item-input">
+                                <input type="text" id="shop-name" placeholder="Shop name"/>
+                            </div>
+                        </div>
+                    </li>
+                <!-- select shop category -->
+                    <li>
+                        <div class="item-content">
+                            <div class="item-inner">
+                                <div class="item-title label">Shop Category</div>
+                                <div class="item-input">
+                                    <select id="shop-category">
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                <!-- area category - toggle list -->
+                    <li>
+                        <div class="item-content">
+                            <div class="item-inner">
+                                <div class="item-title label">Area</div>
+                                <div class="item-input">
+                                    <select id="area">
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                <!-- address text -->
+                    <li>
+                        <div class="item-content">
+                            <div class="item-inner">
+                                <div class="item-title label">Address</div>
+                                <div class="item-input">
+                                    <input type="text" id="shop-addr" placeholder="Address">
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                <!-- contact number   text -->
+                    <li>
+                        <div class="item-content">
+                            <div class="item-inner">
+                                <div class="item-title label">Contact</div>
+                                <div class="item-input">
+                                    <input type="text" id="shop-phone" placeholder="contact number">
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                <!-- upload image-->
+                    <li>
+                        <div class="item-content">
+                            <div class="item-inner">
+                                <div class="item-title label">Thumbnail</div>
+                                <div class="item-input">
+                                    <input type="file" id="shop-img">
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                <!--shop introduction textarea -->
+                    <li class="align-top">
+                        <div class="item-content">
+                            <div class="item-inner">
+                                <div class="item-title label">Shop introduction</div>
+                                <div class="item-input">
+                                    <textarea id="shop-desc" placeholder="Shop introduction"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                <!-- verification code ka -->
+                    <li>
+                        <div class="item-content">
+                            <div class="item-inner">
+                                <div class="item-title label">Verification</div>
+                                <input type="text" id="j_captcha" placeholder="verification code">
+                                <div class="item-input">
+                                    <img id="captcha_img" alt="click to change" title="click to change"
+                                            onclick="changeVerifyCode(this)" src="../Kaptcha"/>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="content-block">
+                <div class="row">
+                    <div class="col-50">
+                        <a href="#" class="button button-big button-fill button-danger">Go back</a>
+                    </div>
+                    <div class="col-50">
+                        <a href="#" class="button button-big button-fill button-success">Submit</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+    <script type='text/javascript'
+		src='../resources/js/common/zepto.min.js' charset='utf-8'></script>
+	<script type='text/javascript'
+		src='../resources/js/common/sm.min.js' charset='utf-8'></script>
+	<script type='text/javascript'
+		src='../resources/js/common/sm-extend.min.js' charset='utf-8'></script>
+	<script type='text/javascript' src='../resources/js/common/common.js'
+		charset='utf-8'></script>
+	<script type='text/javascript'
+		src='../resources/js/shop/shopoperation.js' charset='utf-8'></script>
+</body>
+</html>
+
