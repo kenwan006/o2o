@@ -30,6 +30,7 @@ import com.imooc.o2o.exceptions.ShopOperationException;
 import com.imooc.o2o.service.AreaService;
 import com.imooc.o2o.service.ShopCategoryService;
 import com.imooc.o2o.service.ShopService;
+import com.imooc.o2o.util.CodeUtil;
 import com.imooc.o2o.util.HttpServletRequestUtil;
 import com.imooc.o2o.util.ImageUtil;
 import com.imooc.o2o.util.PathUtil;
@@ -67,7 +68,13 @@ public class ShopManagementController {
 	@ResponseBody
 	private Map<String, Object> registerShop(HttpServletRequest request) {
 		Map<String, Object> modelMap = new HashMap<String, Object>();
-		//1. accept and convert the params including shop info and image info
+		if (!CodeUtil.checkVerifyCode(request)) {
+			modelMap.put("success", false);
+			modelMap.put("errMsg", "输入了错误的验证码");
+			return modelMap;
+		}
+		
+		//1. accept and convert the params including shop info and image info from ajax
 		String shopStr = HttpServletRequestUtil.getString(request, "shopStr");
 		ObjectMapper mapper = new ObjectMapper();
 		Shop shop = null;
@@ -78,9 +85,8 @@ public class ShopManagementController {
 			modelMap.put("errMsg", e.getMessage());
 			return modelMap;
 		}
-		CommonsMultipartFile shopImg = null;
-		CommonsMultipartResolver commonsMultipartResolver = new CommonsMultipartResolver(
-				request.getSession().getServletContext());
+		CommonsMultipartFile shopImg = null; //get image info
+		CommonsMultipartResolver commonsMultipartResolver = new CommonsMultipartResolver(request.getSession().getServletContext());
 		if (commonsMultipartResolver.isMultipart(request)) {
 			MultipartHttpServletRequest multipartHttpServletRequest = (MultipartHttpServletRequest) request;
 			shopImg = (CommonsMultipartFile) multipartHttpServletRequest.getFile("shopImg");
