@@ -2,7 +2,6 @@ package com.imooc.o2o.util;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Random;
@@ -12,6 +11,8 @@ import javax.imageio.ImageIO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
+
+import com.imooc.o2o.dto.ImageHolder;
 
 import net.coobird.thumbnailator.Thumbnails;
 import net.coobird.thumbnailator.geometry.Positions;
@@ -50,30 +51,30 @@ public class ImageUtil {
 	 * @param targetAddr
 	 * @return
 	 */
-	public static String generateThumbnail(InputStream thumbnailInputStream, String fileName, String targetAddr) {
-		// 获取不重复的随机名
+	public static String generateThumbnail(ImageHolder thumbnail, String targetAddr) {
+		// get a random file name
 		String realFileName = getRandomFileName();
-		// 获取文件的扩展名如png,jpg等
-		String extension = getFileExtension(fileName);
-		// 如果目标路径不存在，则自动创建
+		// get the file's extension name, such as png, jpg.
+		String extension = getFileExtension(thumbnail.getImageName());
+		// create if the target path does not exist
 		makeDirPath(targetAddr);
-		// 获取文件存储的相对路径(带文件名)
+		// get the relative path of the file
 		String relativeAddr = targetAddr + realFileName + extension;
 		logger.debug("current relativeAddr is :" + relativeAddr);
-		// 获取文件要保存到的目标路径
+		// get the target path of the file to be stored
 		File dest = new File(PathUtil.getImgBasePath() + relativeAddr);
 		logger.debug("current complete addr is :" + PathUtil.getImgBasePath() + relativeAddr);
 		logger.debug("basePath is :" + basePath);
-		// use thumbnails to generate watermarked image
+		// call Thumbnails to generate watermark for the image
 		try {
-			Thumbnails.of(thumbnailInputStream).size(200, 200)
+			Thumbnails.of(thumbnail.getImage()).size(200, 200)
 					.watermark(Positions.BOTTOM_RIGHT, ImageIO.read(new File(basePath + "/watermark.jpg")), 0.25f)
 					.outputQuality(0.8f).toFile(dest);
 		} catch (IOException e) {
 			logger.error(e.toString());
-			throw new RuntimeException("failed to create thumbnail image：" + e.toString());
+			throw new RuntimeException("Unsuccessful to create thumbnail image: " + e.toString());
 		}
-		// return the relative address of the image
+		// return the relative path of the image
 		return relativeAddr;
 	}
 	
@@ -85,33 +86,31 @@ public class ImageUtil {
 	 * @param targetAddr
 	 * @return
 	 */
-	/**
 	public static String generateNormalImg(ImageHolder thumbnail, String targetAddr) {
-		// 获取不重复的随机名
+		// get a random file name
 		String realFileName = getRandomFileName();
-		// 获取文件的扩展名如png,jpg等
+		// get the file's extension name, such as png, jpg.
 		String extension = getFileExtension(thumbnail.getImageName());
-		// 如果目标路径不存在，则自动创建
+		// create if the target path does not exist
 		makeDirPath(targetAddr);
-		// 获取文件存储的相对路径(带文件名)
+		// get the relative path of the file
 		String relativeAddr = targetAddr + realFileName + extension;
 		logger.debug("current relativeAddr is :" + relativeAddr);
-		// 获取文件要保存到的目标路径
+		// get the target path of the file to be stored
 		File dest = new File(PathUtil.getImgBasePath() + relativeAddr);
 		logger.debug("current complete addr is :" + PathUtil.getImgBasePath() + relativeAddr);
-		// 调用Thumbnails生成带有水印的图片
+		// call Thumbnails to generate watermark for the image
 		try {
 			Thumbnails.of(thumbnail.getImage()).size(337, 640)
 					.watermark(Positions.BOTTOM_RIGHT, ImageIO.read(new File(basePath + "/watermark.jpg")), 0.25f)
 					.outputQuality(0.9f).toFile(dest);
 		} catch (IOException e) {
 			logger.error(e.toString());
-			throw new RuntimeException("创建缩图片失败：" + e.toString());
+			throw new RuntimeException("Unsuccessful to create thumbnail image: " + e.toString());
 		}
-		// 返回图片相对路径地址
+		// return the relative path of the image
 		return relativeAddr;
 	}
-	**/
 	
 	/**
 	 * create the all directory needed for the target path. 
@@ -155,5 +154,23 @@ public class ImageUtil {
 		Thumbnails.of(new File("/Users/chaowan/Pictures/minions.png")).size(200, 200)
 		.watermark(Positions.BOTTOM_RIGHT, ImageIO.read(new File(basePath + "/watermark.jpg")), 0.25f)
 		.outputQuality(0.8f).toFile("/Users/chaowan/Pictures/new_minions.png");
+	}
+	
+	/**
+	 * check if storePath is the path for a file or for a directory
+	 * If it's for a file, then delete the file; if it's for a directory then delete all files within this directory
+	 * @param storePath
+	 */
+	public static void deleteFileOrPath(String storePath) {
+		File fileOrPath = new File(PathUtil.getImgBasePath() + storePath);
+		if (fileOrPath.exists()) {
+			if (fileOrPath.isDirectory()) {
+				File files[] = fileOrPath.listFiles();
+				for (int i = 0; i < files.length; i++) {
+					files[i].delete();
+				}
+			}
+			fileOrPath.delete();
+		}
 	}
 }

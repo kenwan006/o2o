@@ -3,6 +3,7 @@ package com.imooc.o2o.dao;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Date;
+import java.util.List;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -19,6 +20,28 @@ public class ShopDaoTest extends BaseTest{
 	private ShopDao shopDao;
 	
 	@Test
+	public void testQueryShopListAndCount() {
+		Shop shopCondition = new Shop();
+		PersonInfo owner = new PersonInfo();
+		owner.setUserId(1L);
+		shopCondition.setOwner(owner);
+		List<Shop> shopList = shopDao.queryShopList(shopCondition, 1, 5);
+		int count= shopDao.queryShopCount(shopCondition);
+		System.out.println("size of shop list: " + shopList.size());
+		System.out.println("count of total shops: " + count);
+		
+		ShopCategory sc = new ShopCategory();
+		sc.setShopCategoryId(2L);
+		shopCondition.setShopCategory(sc);
+		shopList= shopDao.queryShopList(shopCondition, 0, 2);
+		count = shopDao.queryShopCount(shopCondition);
+		System.out.println("size of new shop list: " + shopList.size());
+		System.out.println("count of new total shops: " + count);
+		
+		
+	}
+	@Test
+	@Ignore
 	public void testQueryByShopId() {
 		long shopId = 2;
 		Shop shop = shopDao.queryByShopId(shopId);

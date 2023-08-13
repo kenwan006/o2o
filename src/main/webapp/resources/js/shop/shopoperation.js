@@ -69,7 +69,7 @@ $(function() {
 				});
 				$('#shop-category').html(tempHtml);
 				$('#area').html(tempAreaHtml);
-			}
+			}    
 		});
 	}
 	// 提交按钮的事件响应，分别对店铺注册和编辑操作做不同响应

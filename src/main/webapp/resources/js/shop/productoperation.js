@@ -1,17 +1,18 @@
 $(function() {
-	// 从URL里获取productId参数的值
+	// get productId from the URL
 	var productId = getQueryString('productId');
-	// 通过productId获取商品信息的URL
+	// get the URL of product info using productId
 	var infoUrl = '/o2o/shopadmin/getproductbyid?productId=' + productId;
-	// 获取当前店铺设定的商品类别列表的URL
+	// get the URL to the product category list of the current shop
 	var categoryUrl = '/o2o/shopadmin/getproductcategorylist';
-	// 更新商品信息的URL
+	// update the URL to the product info
 	var productPostUrl = '/o2o/shopadmin/modifyproduct';
-	// 由于商品添加和编辑使用的是同一个页面，
-	// 该标识符用来标明本次是添加还是编辑操作
+
+	// Eidt and Add product use the same web page
+	// use isEdit to decide Edit or Add
 	var isEdit = false;
 	if (productId) {
-		// 若有productId则为编辑操作
+		// the operation is Edit if there is productId
 		getInfo(productId);
 		isEdit = true;
 	} else {
@@ -19,27 +20,25 @@ $(function() {
 		productPostUrl = '/o2o/shopadmin/addproduct';
 	}
 
-	// 获取需要编辑的商品的商品信息，并赋值给表单
+	// get the info of the product that will be edited, and assign the values
 	function getInfo(id) {
 		$
 				.getJSON(
 						infoUrl,
 						function(data) {
 							if (data.success) {
-								// 从返回的JSON当中获取product对象的信息，并赋值给表单
+								// get product info from the return JSON, and assign values to the form
 								var product = data.product;
 								$('#product-name').val(product.productName);
 								$('#product-desc').val(product.productDesc);
 								$('#priority').val(product.priority);
-								$('#point').val(product.point);
 								$('#normal-price').val(product.normalPrice);
-								$('#promotion-price').val(
-										product.promotionPrice);
-								// 获取原本的商品类别以及该店铺的所有商品类别列表
+								$('#promotion-price').val(product.promotionPrice);
+								// get the category of original product and all product category list of the current shop
 								var optionHtml = '';
 								var optionArr = data.productCategoryList;
 								var optionSelected = product.productCategory.productCategoryId;
-								// 生成前端的HTML商品类别列表，并默认选择编辑前的商品类别
+								// generate the frontend product category list, and select all the product category before the edit
 								optionArr
 										.map(function(item, index) {
 											var isSelect = optionSelected === item.productCategoryId ? 'selected'
@@ -57,7 +56,7 @@ $(function() {
 						});
 	}
 
-	// 为商品添加操作提供该店铺下的所有商品类别列表
+	// get all the product category list of the shop, and add new product 
 	function getCategory() {
 		$.getJSON(categoryUrl, function(data) {
 			if (data.success) {
@@ -73,26 +72,25 @@ $(function() {
 		});
 	}
 
-	// 针对商品详情图控件组，若该控件组的最后一个元素发生变化（即上传了图片），
-	// 且控件总数未达到6个，则生成新的一个文件上传控件
+	// for the widge to upload images, if the last image changes
+	// and total uploaded images is less than 6, then generate a new widget for uploading use
 	$('.detail-img-div').on('change', '.detail-img:last-child', function() {
 		if ($('.detail-img').length < 6) {
 			$('#detail-img').append('<input type="file" class="detail-img">');
 		}
 	});
 
-	// 提交按钮的事件响应，分别对商品添加和编辑操作做不同响应
+	// click the submit
 	$('#submit').click(
 			function() {
-				// 创建商品json对象，并从表单里面获取对应的属性值
+				// create json object, and get the info from the dataform for all the attributes
 				var product = {};
 				product.productName = $('#product-name').val();
 				product.productDesc = $('#product-desc').val();
 				product.priority = $('#priority').val();
-				product.point = $('#point').val();
 				product.normalPrice = $('#normal-price').val();
 				product.promotionPrice = $('#promotion-price').val();
-				// 获取选定的商品类别值
+				// get the product category of the selected product
 				product.productCategory = {
 					productCategoryId : $('#category').find('option').not(
 							function() {
@@ -101,31 +99,31 @@ $(function() {
 				};
 				product.productId = productId;
 
-				// 获取缩略图文件流
+				// get the file stream of the thumbnail image
 				var thumbnail = $('#small-img')[0].files[0];
-				// 生成表单对象，用于接收参数并传递给后台
+				// create formdata to accept data and pass to backend
 				var formData = new FormData();
 				formData.append('thumbnail', thumbnail);
-				// 遍历商品详情图控件，获取里面的文件流
+				// get the file stream of each detail image
 				$('.detail-img').map(
 						function(index, item) {
-							// 判断该控件是否已选择了文件
+							// check if any file has been selected
 							if ($('.detail-img')[index].files.length > 0) {
-								// 将第i个文件流赋值给key为productImgi的表单键值对里
+								// assign ith file stream to the "productImg" in the form
 								formData.append('productImg' + index,
 										$('.detail-img')[index].files[0]);
 							}
 						});
-				// 将product json对象转成字符流保存至表单对象key为productStr的的键值对里
+				// convert product json object to string stream and save to "productStr" in the form
 				formData.append('productStr', JSON.stringify(product));
-				// 获取表单里输入的验证码
+				// get verification code from the form
 				var verifyCodeActual = $('#j_captcha').val();
 				if (!verifyCodeActual) {
-					$.toast('请输入验证码！');
+					$.toast('Please input verfication code！');
 					return;
 				}
 				formData.append("verifyCodeActual", verifyCodeActual);
-				// 将数据提交至后台处理相关操作
+				// send data to backend and process
 				$.ajax({
 					url : productPostUrl,
 					type : 'POST',
@@ -135,10 +133,10 @@ $(function() {
 					cache : false,
 					success : function(data) {
 						if (data.success) {
-							$.toast('提交成功！');
+							$.toast('Successful submission！');
 							$('#captcha_img').click();
 						} else {
-							$.toast('提交失败！');
+							$.toast('Unsuccessful submission！');
 							$('#captcha_img').click();
 						}
 					}

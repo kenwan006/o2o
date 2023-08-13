@@ -32,18 +32,18 @@ $(function() {
 
 	function shopStatus(status) {
 		if (status == 0) {
-			return '审核中';
+			return 'Under review';
 		} else if (status == -1) {
-			return '店铺非法';
+			return 'Invalid shop';
 		} else if (status == 1) {
-			return '审核通过';
+			return 'Approved';
 		}
 	}
 
 	function goShop(status, id) {
 		if (status == 1) {
 			return '<a href="/o2o/shopadmin/shopmanagement?shopId=' + id
-					+ '">进入</a>';
+					+ '">Enter</a>';
 		} else {
 			return '';
 		}
