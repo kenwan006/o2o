@@ -89,7 +89,7 @@ public class ProductServiceImpl implements ProductService {
 	@Transactional
 	// 1. Process the thumbnail if it's not null
 	//    Delete thumbnail if it exits, and then create new one. And get the relative path of the thumbnail and assign it to product
-	// 2. Same process if the product image list is not null
+	// 2. Same process if the product detail image list is not null
 	// 3. Remove from the tb_product_img all the images that belongs to the specified product
 	// 4. update tb_product_img and tb_product 
 	public ProductExecution modifyProduct(Product product, ImageHolder thumbnail, List<ImageHolder> productImgHolderList) throws ProductOperationException {
@@ -182,7 +182,7 @@ public class ProductServiceImpl implements ProductService {
 		for (ProductImg productImg : productImgList) {
 			ImageUtil.deleteFileOrPath(productImg.getImgAddr());
 		}
-		// delete all the image info the database
+		// delete all the image info from the database
 		productImgDao.deleteProductImgByProductId(productId);
 	}
 }

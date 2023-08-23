@@ -35,10 +35,11 @@
 			<result column="product_id" property="productId" />
 		</collection>
 	</resultMap>
+
 	<select id="queryProductList" resultType="com.imooc.o2o.entity.Product">
 		SELECT product_id, product_name, product_desc, img_addr, normal_price,
 		promotion_price, priority, create_time, last_edit_time, enable_status,
-		point, product_category_id, shop_id FROM tb_product <where>
+		product_category_id, shop_id FROM tb_product <where>
 			<if
 				test="productCondition.shop!=null
 				 and productCondition.shop.shopId!=null">
@@ -50,9 +51,9 @@
 		and product_category_id =
 		#{productCondition.productCategory.productCategoryId}
 			</if>
-			<!-- 写like语句的时候 一般都会写成 like '% %' 在mybatis里面写就是应该是 like '%${name} %'
-			而不是 
-				'%#{name} %' ${name} 是不带单引号的，而#{name} 是带单引号的 -->
+			<!-- usually we write like query as like '% %' but in mybatis we
+			have to write like '%${name} %'
+			instead of '%#{name} %'  -->
 			<if test="productCondition.productName!=null">
 				and product_name like '%${productCondition.productName}%'
 			</if>
@@ -60,7 +61,8 @@
 				and enable_status = #{productCondition.enableStatus}
 			</if>
 		</where>
-		ORDER BY priority DESC LIMIT #{rowIndex},#{pageSize}; </select>
+		ORDER BY priority DESC LIMIT #{rowIndex},#{pageSize}; 
+	</select>
 
 	<select id="queryProductCount" resultType="int"> SELECT count(1) FROM
 		tb_product <where>
@@ -83,6 +85,7 @@
 			</if>
 		</where>
 	</select>
+	
 	<select id="queryProductById" resultMap="productMap"
 		parameterType="Long">
 		SELECT
@@ -95,8 +98,7 @@
 		p.priority,
 		p.create_time,
 		p.last_edit_time,
-		p.enable_status,
-		p.point,
+		p.enable_status,f
 		p.product_category_id,
 		p.shop_id,
 		pm.product_img_id,
@@ -117,6 +119,7 @@
 		ORDER BY
 		pm.priority DESC
 	</select>
+	
 	<insert id="insertProduct" parameterType="com.imooc.o2o.entity.Product"
 		useGeneratedKeys="true" keyProperty="productId" keyColumn="product_id">
 		INSERT INTO
@@ -130,6 +133,7 @@
 		#{lastEditTime},#{enableStatus},#{productCategory.productCategoryId},
 		#{shop.shopId})
 	</insert>
+	
 	<update id="updateProduct" parameterType="com.imooc.o2o.entity.Product"
 		keyProperty="product_id" useGeneratedKeys="true"> UPDATE tb_product <set>
 			<if test="productName != null">product_name=#{productName},</if>
@@ -140,14 +144,15 @@
 			<if test="priority != null">priority=#{priority},</if>
 			<if test="lastEditTime != null">last_edit_time=#{lastEditTime},</if>
 			<if test="enableStatus != null">enable_status=#{enableStatus},</if>
-			<if test="point != null">point=#{point},</if>
 			<if
 				test="productCategory != null
 				 and productCategory.productCategoryId != null">
 		product_category_id=#{productCategory.productCategoryId}
 			</if>
 		</set>
-		WHERE product_id = #{productId} AND shop_id=#{shop.shopId} </update>
+		WHERE product_id = #{productId} AND shop_id=#{shop.shopId} 
+	</update>
+		
 	<update id="updateProductCategoryToNull" parameterType="Long">
 		UPDATE
 		tb_product
@@ -156,6 +161,7 @@
 		WHERE product_category_id =
 		#{productCategoryId}
 	</update>
+	
 	<delete id="deleteProduct">
 		DELETE FROM
 		tb_product

@@ -11,7 +11,7 @@ import com.imooc.o2o.BaseTest;
 import com.imooc.o2o.entity.ShopCategory;
 
 
-public class ShopCategoryTest extends BaseTest {
+public class ShopCategoryDaoTest extends BaseTest {
 	@Autowired
 	private ShopCategoryDao shopCategoryDao;
 	@Test

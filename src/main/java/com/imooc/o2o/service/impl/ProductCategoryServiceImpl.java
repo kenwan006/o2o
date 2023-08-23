@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.imooc.o2o.dao.ProductCategoryDao;
+import com.imooc.o2o.dao.ProductDao;
 import com.imooc.o2o.dto.ProductCategoryExecution;
 import com.imooc.o2o.entity.ProductCategory;
 import com.imooc.o2o.enums.ProductCategoryStateEnum;
@@ -17,7 +18,8 @@ import com.imooc.o2o.service.ProductCategoryService;
 public class ProductCategoryServiceImpl implements ProductCategoryService {
 	@Autowired
 	private ProductCategoryDao productCategoryDao;
-	
+	@Autowired
+	private ProductDao productDao;
 	@Override
 	public List<ProductCategory> getProductCategoryList(long shopId) {
 		return productCategoryDao.queryProductCategoryList(shopId);
@@ -47,7 +49,16 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
 	@Transactional
 	public ProductCategoryExecution deleteProductCategory(long productCategoryId, long shopId)
 			throws ProductCategoryOperationException {
-		// TODO For the product from this product category, set their product category to null
+		// remove the association of the product with the product category
+		try {
+			int effectedNum = productDao.updateProductCategoryToNull(productCategoryId);
+			if (effectedNum < 0) {
+				throw new ProductCategoryOperationException("Unsuccessful to update product category");
+			}
+		} catch (Exception e) {
+			throw new ProductCategoryOperationException("deleteProductCategory error: " + e.getMessage());
+		}
+
 		// Delete this productCategory
 		try {
 			int effectedNum = productCategoryDao.deleteProductCategory(productCategoryId, shopId);

@@ -1,47 +1,47 @@
 $(function() {
-	// 获取此店铺下的商品列表的URL
+	// get the url for the product list of current shop
 	var listUrl = '/o2o/shopadmin/getproductlistbyshop?pageIndex=1&pageSize=999';
-	// 商品下架URL
+	// URL - take the product off the shelf
 	var statusUrl = '/o2o/shopadmin/modifyproduct';
 	getList();
 	/**
-	 * 获取此店铺下的商品列表
+	 * get the product list of the current shop
 	 * 
 	 * @returns
 	 */
 	function getList() {
-		// 从后台获取此店铺的商品列表
+		// get product list from backend
 		$.getJSON(listUrl, function(data) {
 			if (data.success) {
 				var productList = data.productList;
 				var tempHtml = '';
-				// 遍历每条商品信息，拼接成一行显示，列信息包括：
-				// 商品名称，优先级，上架\下架(含productId)，编辑按钮(含productId)
-				// 预览(含productId)
+				// iterate each shop info, and concatenate them to include
+				// product name, priority, on/off shelf (with productID), edit button (with productId)
+				// preview (with productId)
 				productList.map(function(item, index) {
-					var textOp = "下架";
+					var textOp = "Off shelf"; //invalid
 					var contraryStatus = 0;
 					if (item.enableStatus == 0) {
-						// 若状态值为0，表明是已下架的商品，操作变为上架(即点击上架按钮上架相关商品)
-						textOp = "上架";
+						// if the status is 0, it means the product is not valid, operation becomes valid when click button to put product on shelf
+						textOp = "On shelf"; //valid
 						contraryStatus = 1;
 					} else {
 						contraryStatus = 0;
 					}
-					// 拼接每件商品的行信息
+					// concatenate for each shop
 					tempHtml += '' + '<div class="row row-product">'
 							+ '<div class="col-33">'
 							+ item.productName
 							+ '</div>'
 							+ '<div class="col-20">'
-							+ item.point
+							+ item.priority
 							+ '</div>'
 							+ '<div class="col-40">'
 							+ '<a href="#" class="edit" data-id="'
 							+ item.productId
 							+ '" data-status="'
 							+ item.enableStatus
-							+ '">编辑</a>'
+							+ '">Edit</a>'
 							+ '<a href="#" class="status" data-id="'
 							+ item.productId
 							+ '" data-status="'
@@ -53,16 +53,16 @@ $(function() {
 							+ item.productId
 							+ '" data-status="'
 							+ item.enableStatus
-							+ '">预览</a>'
+							+ '">Preview</a>'
 							+ '</div>'
 							+ '</div>';
 				});
-				// 将拼接好的信息赋值进html控件中
+				// assign the concatenated result to htlm controller in the frontend
 				$('.product-wrap').html(tempHtml);
 			}
 		});
 	}
-	// 将class为product-wrap里面的a标签绑定上点击的事件
+	// associate the label 'a' in the class product-wrap with the click event
 	$('.product-wrap')
 			.on(
 					'click',
@@ -70,26 +70,26 @@ $(function() {
 					function(e) {
 						var target = $(e.currentTarget);
 						if (target.hasClass('edit')) {
-							// 如果有class edit则点击就进入店铺信息编辑页面，并带有productId参数
+							// if there is class edit, then just click to enter into the page for editing with productId
 							window.location.href = '/o2o/shopadmin/productoperation?productId='
 									+ e.currentTarget.dataset.id;
 						} else if (target.hasClass('status')) {
-							// 如果有class status则调用后台功能上/下架相关商品，并带有productId参数
+							// if there is class status, then call the function to take the product on/off the shelf with productId
 							changeItemStatus(e.currentTarget.dataset.id,
 									e.currentTarget.dataset.status);
 						} else if (target.hasClass('preview')) {
-							// 如果有class preview则去前台展示系统该商品详情页预览商品情况
+							// if there class preview, then just go to the frontend to display the info of the product
 							window.location.href = '/o2o/frontend/productdetail?productId='
 									+ e.currentTarget.dataset.id;
 						}
 					});
 	function changeItemStatus(id, enableStatus) {
-		// 定义product json对象并添加productId以及状态(上架/下架)
+		// define product Json object and add productId and status(on/off shlef)
 		var product = {};
 		product.productId = id;
 		product.enableStatus = enableStatus;
-		$.confirm('确定么?', function() {
-			// 上下架相关商品
+		$.confirm('Are you sure?', function() {
+			// off/on the product
 			$.ajax({
 				url : statusUrl,
 				type : 'POST',
@@ -100,10 +100,10 @@ $(function() {
 				dataType : 'json',
 				success : function(data) {
 					if (data.success) {
-						$.toast('操作成功！');
+						$.toast('Successful operation！');
 						getList();
 					} else {
-						$.toast('操作失败！');
+						$.toast('Unsuccessful operation！');
 					}
 				}
 			});

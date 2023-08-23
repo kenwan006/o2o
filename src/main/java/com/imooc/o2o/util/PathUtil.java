@@ -9,24 +9,24 @@ public class PathUtil {
 		if (os.toLowerCase().startsWith("win")) {
 			basePath = "D:/projectdev/image";
 		} else {
-			basePath = "/Users/chaowan/Pictures/images";
+			basePath = "/Users/chaowan/Pictures/image";
 		}
 		basePath = basePath.replace("/", seperator);
 		return basePath;
 	}
 
 	public static String getShopImagePath(long shopId) {
-		String imagePath = "/item/shop/" + shopId + "/";
+		String imagePath = "/upload/images/item/shop/" + shopId + "/";
 		return imagePath.replace("/", seperator);
 	}
 
 	public static String getHeadLineImagePath() {
-		String imagePath = "/item/headtitle/";
+		String imagePath = "/upload/images/item/headtitle/";
 		return imagePath.replace("/", seperator);
 	}
 
 	public static String getShopCategoryPath() {
-		String imagePath = "/item/shopcategory/";
+		String imagePath = "/upload/images/item/shopcategory/";
 		return imagePath.replace("/", seperator);
 	}
 }

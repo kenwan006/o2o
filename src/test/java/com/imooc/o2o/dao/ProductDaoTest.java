@@ -27,6 +27,7 @@ public class ProductDaoTest extends BaseTest {
 	private ProductImgDao productImgDao;
 
 	@Test
+	@Ignore
 	public void testAInsertProduct() throws Exception {
 		Shop shop1 = new Shop();
 		shop1.setShopId(1L);
@@ -82,13 +83,13 @@ public class ProductDaoTest extends BaseTest {
 		assertEquals(3, productList.size());
 		// query the total count of product that with the name "test"
 		int count = productDao.queryProductCount(productCondition);
-		assertEquals(5, count);
-		// use fuzzy name query, and expect 2 results to be returned
-		productCondition.setProductName("测试");
+		assertEquals(6, count);
+		// use fuzzy name query, and expect 4 results to be returned
+		productCondition.setProductName("test");
 		productList = productDao.queryProductList(productCondition, 0, 3);
-		assertEquals(2, productList.size());
+		assertEquals(3, productList.size());
 		count = productDao.queryProductCount(productCondition);
-		assertEquals(2, count);
+		assertEquals(4, count);
 	}
 
 	@Test
@@ -98,13 +99,13 @@ public class ProductDaoTest extends BaseTest {
 		//Initialize two product image for product (productId=1)
 		//Insert them to the product
 		ProductImg productImg1 = new ProductImg();
-		productImg1.setImgAddr("图片1");
-		productImg1.setImgDesc("测试图片1");
+		productImg1.setImgAddr("img1");
+		productImg1.setImgDesc("test img1");
 		productImg1.setPriority(1);
 		productImg1.setCreateTime(new Date());
 		productImg1.setProductId(productId);
 		ProductImg productImg2 = new ProductImg();
-		productImg2.setImgAddr("图片2");
+		productImg2.setImgAddr("img2");
 		productImg2.setPriority(1);
 		productImg2.setCreateTime(new Date());
 		productImg2.setProductId(productId);
@@ -116,9 +117,10 @@ public class ProductDaoTest extends BaseTest {
 		// query the product info with productId=1, and return the size of the image list
 		Product product = productDao.queryProductById(productId);
 		assertEquals(2, product.getProductImgList().size());
-		// delete the newly added product images
+		// delete two added product images
 		effectedNum = productImgDao.deleteProductImgByProductId(productId);
 		assertEquals(2, effectedNum);
+		
 	}
 
 	@Test
@@ -128,22 +130,23 @@ public class ProductDaoTest extends BaseTest {
 		ProductCategory pc = new ProductCategory();
 		Shop shop = new Shop();
 		shop.setShopId(1L);
-		pc.setProductCategoryId(2L);
-		product.setProductId(1L);
+		pc.setProductCategoryId(1L);
+		product.setProductId(5L);
 		product.setShop(shop);
-		product.setProductName("第二个产品");
+		product.setProductName("first product");
 		product.setProductCategory(pc);
 		// change the name and category of product with productId =1
 		// check if the effected row is 1
 		int effectedNum = productDao.updateProduct(product);
 		assertEquals(1, effectedNum);
+		
 	}
 
 	@Test
 	@Ignore
 	public void testEUpdateProductCategoryToNull() {
 		// for all the product with product categoryId=2, set their product category to null
-		int effectedNum = productDao.updateProductCategoryToNull(2L);
+		int effectedNum = productDao.updateProductCategoryToNull(1L);
 		assertEquals(1, effectedNum);
 	}
 

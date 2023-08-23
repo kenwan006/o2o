@@ -41,7 +41,39 @@ public class ProductManagementController {
 
 	//at most 6 images can be uploaded 
 	private static final int IMAGEMAXCOUNT = 6;
-
+	
+	/**
+	 * query the product list of the specified shop by the shopId
+	 * 
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/getproductlistbyshop", method = RequestMethod.GET)
+	@ResponseBody
+	private Map<String, Object> getProductListByShop(HttpServletRequest request) {
+		Map<String, Object> modelMap = new HashMap<String, Object>();
+		// get the page index from frontend
+		int pageIndex = HttpServletRequestUtil.getInt(request, "pageIndex");
+		// get the page size from the frontend
+		int pageSize = HttpServletRequestUtil.getInt(request, "pageSize");
+		// get the shop info from the session, such as shopId
+		Shop currentShop = (Shop) request.getSession().getAttribute("currentShop");
+		// check if it's null
+		if ((pageIndex > -1) && (pageSize > -1) && (currentShop != null) && (currentShop.getShopId() != null)) {
+			long productCategoryId = HttpServletRequestUtil.getLong(request, "productCategoryId");
+			String productName = HttpServletRequestUtil.getString(request, "productName");
+			Product productCondition = compactProductCondition(currentShop.getShopId(), productCategoryId, productName);
+			// accept the query condition and paging requirement, and return the product list and total count
+			ProductExecution pe = productService.getProductList(productCondition, pageIndex, pageSize);
+			modelMap.put("productList", pe.getProductList());
+			modelMap.put("count", pe.getCount());
+			modelMap.put("success", true);
+		} else {
+			modelMap.put("success", false);
+			modelMap.put("errMsg", "empty pageSize or pageIndex or shopId");
+		}
+		return modelMap;
+	}
 	
 	/**
 	 * get the product info by the product id
@@ -156,5 +188,103 @@ public class ProductManagementController {
 			}
 		}
 		return thumbnail;
+	}
+	
+	/**
+	 * modify product
+	 * 
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/modifyproduct", method = RequestMethod.POST)
+	@ResponseBody
+	private Map<String, Object> modifyProduct(HttpServletRequest request) {
+		Map<String, Object> modelMap = new HashMap<String, Object>();
+		boolean statusChange = HttpServletRequestUtil.getBoolean(request, "statusChange");
+		// verification code
+		if (!statusChange && !CodeUtil.checkVerifyCode(request)) {
+			modelMap.put("success", false);
+			modelMap.put("errMsg", "Wrong verification code ");
+			return modelMap;
+		}
+		// accept the front end parameters including product, thumbnail image, product detail image
+		ObjectMapper mapper = new ObjectMapper();
+		Product product = null;
+		ImageHolder thumbnail = null;
+		List<ImageHolder> productImgList = new ArrayList<ImageHolder>();
+		CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver(
+				request.getSession().getServletContext());
+		// If the request includes any file stream, then extract the related images
+		try {
+			if (multipartResolver.isMultipart(request)) {
+				thumbnail = handleImage(request, thumbnail, productImgList);
+			}
+		} catch (Exception e) {
+			modelMap.put("success", false);
+			modelMap.put("errMsg", e.toString());
+			return modelMap;
+		}
+		try {
+			String productStr = HttpServletRequestUtil.getString(request, "productStr");
+			// try to get the formdata from frontend and convert it to product entity
+			product = mapper.readValue(productStr, Product.class);
+		} catch (Exception e) {
+			modelMap.put("success", false);
+			modelMap.put("errMsg", e.toString());
+			return modelMap;
+		}
+		// check if it's null
+		if (product != null) {
+			try {
+				// get shopId from the current shop and assign it to the product
+				Shop currentShop = (Shop) request.getSession().getAttribute("currentShop");
+				product.setShop(currentShop);
+				// operate modification on the product
+				ProductExecution pe = productService.modifyProduct(product, thumbnail, productImgList);
+				if (pe.getState() == ProductStateEnum.SUCCESS.getState()) {
+					modelMap.put("success", true);
+				} else {
+					modelMap.put("success", false);
+					modelMap.put("errMsg", pe.getStateInfo());
+				}
+			} catch (RuntimeException e) {
+				modelMap.put("success", false);
+				modelMap.put("errMsg", e.toString());
+				return modelMap;
+			}
+
+		} else {
+			modelMap.put("success", false);
+			modelMap.put("errMsg", "Please input product info");
+		}
+		return modelMap;
+	}
+
+	/**
+	 * 
+	 *  Compact product query to product entity
+	 *  
+	 * @param shopId(mandatory)
+	 * @param productCategoryId(optional)
+	 * @param productName(optional)
+	 * @return
+	 */
+	@SuppressWarnings("unused")
+	private Product compactProductCondition(long shopId, long productCategoryId, String productName) {
+		Product productCondition = new Product();
+		Shop shop = new Shop();
+		shop.setShopId(shopId);
+		productCondition.setShop(shop);
+		// If product category is required, then add it to the product condition
+		if (productCategoryId != -1L) {
+			ProductCategory productCategory = new ProductCategory();
+			productCategory.setProductCategoryId(productCategoryId);
+			productCondition.setProductCategory(productCategory);
+		}
+		// If query by the product name is required, then add it to the product condition
+		if (productName != null) {
+			productCondition.setProductName(productName);
+		}
+		return productCondition;
 	}
 }
