@@ -1,8 +1,8 @@
 # o2o
-## Backend
+- Backend
 `Spring MVC`,
 `Tomcat + Servlet`
-## Frontend
+- Frontend
 `Ajax + JQuery` to show dynamic web page
-## Database
+- Database
 `MySql`
